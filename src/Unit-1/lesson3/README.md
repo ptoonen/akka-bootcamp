@@ -42,7 +42,7 @@ You make child actors the same way, except you create them from another actor, l
 class MyActorClass : UntypedActor{
 	protected override void PreStart(){
 		IActorRef myFirstChildActor = Context.ActorOf(Props.Create(() =>
-        new MyChildActorClass()), "myFirstChildActor");
+		new MyChildActorClass()), "myFirstChildActor");
 	}
 }
 ```
@@ -65,7 +65,7 @@ IActorRef myFirstActor = MyActorSystem.ActorOf(Props.Create(() => new MyActorCla
 
 This name is not required. It is perfectly valid to create an actor without a name, like so:
 ```csharp
-// last arg to the call to ActorOf() is a name
+// call to ActorOf() without specifying a name
 IActorRef myFirstActor = MyActorSystem.ActorOf(Props.Create(() => new MyActorClass()))
 ```
 
@@ -108,14 +108,14 @@ There are 3 ways to properly create `Props`, and they all involve a call to `Pro
 
   While it looks simple, **we recommend that you do not use this approach.** Why? *Because it has no type safety and can easily introduce bugs where everything compiles fine, and then blows up at runtime*.
 
-1. **The lambda syntax**:
+2. **The lambda syntax**:
   ```csharp
   Props props2 = Props.Create(() => new MyActor(..), "...");
   ```
 
   This is a mighty fine syntax, and our favorite. You can pass in the arguments required by the constructor of your actor class inline, along with a name.
 
-1. **The generic syntax**:
+3. **The generic syntax**:
   ```csharp
   Props props3 = Props.Create<MyActor>();
   ```
@@ -142,62 +142,60 @@ using Akka.Actor;
 
 namespace WinTail
 {
-    /// <summary>
-    /// Actor that validates user input and signals result to others.
-    /// </summary>
-    public class ValidationActor : UntypedActor
-    {
-        private readonly IActorRef _consoleWriterActor;
+	/// <summary>
+	/// Actor that validates user input and signals result to others.
+	/// </summary>
+	public class ValidationActor : UntypedActor
+	{
+		private readonly IActorRef _consoleWriterActor;
 
-        public ValidationActor(IActorRef consoleWriterActor)
-        {
-            _consoleWriterActor = consoleWriterActor;
-        }
+		public ValidationActor(IActorRef consoleWriterActor)
+		{
+			_consoleWriterActor = consoleWriterActor;
+		}
 
-        protected override void OnReceive(object message)
-        {
-            var msg = message as string;
-            if (string.IsNullOrEmpty(msg))
-            {
-                // signal that the user needs to supply an input
-                _consoleWriterActor.Tell(
-                  new Messages.NullInputError("No input received."));
-            }
-            else
-            {
-                var valid = IsValid(msg);
-                if (valid)
-                {
-                    // send success to console writer
-                    _consoleWriterActor.Tell(new Messages.InputSuccess("Thank you!
-                     Message was valid."));
-                }
-                else
-                {
-                    // signal that input was bad
-                    _consoleWriterActor.Tell(new Messages.ValidationError("Invalid:
-                     input had odd number of characters."));
-                }
-            }
+		protected override void OnReceive(object message)
+		{
+			var msg = message as string;
+			if (string.IsNullOrEmpty(msg))
+			{
+				// signal that the user needs to supply an input
+				_consoleWriterActor.Tell(
+				  new Messages.NullInputError("No input received."));
+			}
+			else
+			{
+				var valid = IsValid(msg);
+				if (valid)
+				{
+					// send success to console writer
+					_consoleWriterActor.Tell(new Messages.InputSuccess("Thank you! Message was valid."));
+				}
+				else
+				{
+					// signal that input was bad
+					_consoleWriterActor.Tell(new Messages.ValidationError("Invalid: input had odd number of characters."));
+				}
+			}
 
-            // tell sender to continue doing its thing
-            // (whatever that may be, this actor doesn't care)
-            Sender.Tell(new Messages.ContinueProcessing());
+			// tell sender to continue doing its thing
+			// (whatever that may be, this actor doesn't care)
+			Sender.Tell(new Messages.ContinueProcessing());
 
-        }
+		}
 
-        /// <summary>
-        /// Determines if the message received is valid.
-        /// Checks if number of chars in message received is even.
-        /// </summary>
-        /// <param name="msg"></param>
-        /// <returns></returns>
-        private static bool IsValid(string msg)
-        {
-            var valid = msg.Length % 2 == 0;
-            return valid;
-        }
-    }
+		/// <summary>
+		/// Determines if the message received is valid.
+		/// Checks if number of chars in message received is even.
+		/// </summary>
+		/// <param name="msg"></param>
+		/// <returns></returns>
+		private static bool IsValid(string msg)
+		{
+			var valid = msg.Length % 2 == 0;
+			return valid;
+		}
+	}
 }
 ```
 
@@ -221,16 +219,16 @@ Your code should look like this right now:
 // Program.cs
 static void Main(string[] args)
 {
-    // initialize MyActorSystem
-    MyActorSystem = ActorSystem.Create("MyActorSystem");
+	// initialize MyActorSystem
+	MyActorSystem = ActorSystem.Create("MyActorSystem");
 
-    // nothing here where our actors used to be!
+	// nothing here where our actors used to be!
 
-    // tell console reader to begin
-    consoleReaderActor.Tell(ConsoleReaderActor.StartCommand);
+	// tell console reader to begin
+	consoleReaderActor.Tell(ConsoleReaderActor.StartCommand);
 
-    // blocks the main thread from exiting until the actor system is shut down
-    MyActorSystem.WhenTerminated.Wait();
+	// blocks the main thread from exiting until the actor system is shut down
+	MyActorSystem.WhenTerminated.Wait();
 }
 ```
 
@@ -253,7 +251,7 @@ Add this just to `Main()` also:
 ```csharp
 // Program.cs
 Props validationActorProps = Props.Create(
-    () => new ValidationActor(consoleWriterActor));
+	() => new ValidationActor(consoleWriterActor));
 ```
 
 As you can see, here we're using the lambda syntax.
@@ -278,7 +276,7 @@ Add this to `Main()` on the line after `consoleWriterProps`:
 ```csharp
 // Program.cs
 IActorRef consoleWriterActor = MyActorSystem.ActorOf(consoleWriterProps,
-    "consoleWriterActor");
+	"consoleWriterActor");
 ```
 
 
@@ -288,7 +286,7 @@ Add this to `Main()` on the line after `validationActorProps`:
 ```csharp
 // Program.cs
 IActorRef validationActor = MyActorSystem.ActorOf(validationActorProps, 
-    "validationActor");
+	"validationActor");
 ```
 
 #### Make a new `IActorRef` for `consoleReaderActor`
@@ -297,7 +295,7 @@ Add this to `Main()` on the line after `consoleReaderProps`:
 ```csharp
 // Program.cs
 IActorRef consoleReaderActor = MyActorSystem.ActorOf(consoleReaderProps,
-    "consoleReaderActor");
+	"consoleReaderActor");
 ```
 
 #### Calling out a special `IActorRef`: `Sender`
@@ -329,63 +327,63 @@ using Akka.Actor;
 
 namespace WinTail
 {
-    /// <summary>
-    /// Actor responsible for reading FROM the console.
-    /// Also responsible for calling <see cref="ActorSystem.Shutdown"/>.
-    /// </summary>
-    class ConsoleReaderActor : UntypedActor
-    {
-        public const string StartCommand = "start";
-        public const string ExitCommand = "exit";
-        private readonly IActorRef _validationActor;
+	/// <summary>
+	/// Actor responsible for reading FROM the console.
+	/// Also responsible for calling <see cref="ActorSystem.Shutdown"/>.
+	/// </summary>
+	class ConsoleReaderActor : UntypedActor
+	{
+		public const string StartCommand = "start";
+		public const string ExitCommand = "exit";
+		private readonly IActorRef _validationActor;
 
-        public ConsoleReaderActor(IActorRef validationActor)
-        {
-            _validationActor = validationActor;
-        }
+		public ConsoleReaderActor(IActorRef validationActor)
+		{
+			_validationActor = validationActor;
+		}
 
-        protected override void OnReceive(object message)
-        {
-            if (message.Equals(StartCommand))
-            {
-                DoPrintInstructions();
-            }
+		protected override void OnReceive(object message)
+		{
+			if (message.Equals(StartCommand))
+			{
+				DoPrintInstructions();
+			}
 
-            GetAndValidateInput();
-        }
-
-
-        #region Internal methods
-        private void DoPrintInstructions()
-        {
-            Console.WriteLine("Write whatever you want into the console!");
-            Console.WriteLine("Some entries will pass validation; some won't...\n\n");
-            Console.WriteLine("Type 'exit' to quit this application at any time.\n");
-        }
+			GetAndValidateInput();
+		}
 
 
-        /// <summary>
-        /// Reads input from console, validates it, then signals appropriate response
-        /// (continue processing, error, success, etc.).
-        /// </summary>
-        private void GetAndValidateInput()
-        {
-            var message = Console.ReadLine();
-            if (!string.IsNullOrEmpty(message) &&
-            String.Equals(message, ExitCommand, StringComparison.OrdinalIgnoreCase))
-            {
-                // if user typed ExitCommand, shut down the entire actor
-                // system (allows the process to exit)
-                Context.System.Terminate();
-                return;
-            }
+		#region Internal methods
+		private void DoPrintInstructions()
+		{
+			Console.WriteLine("Write whatever you want into the console!");
+			Console.WriteLine("Some entries will pass validation; some won't...\n\n");
+			Console.WriteLine("Type 'exit' to quit this application at any time.\n");
+		}
 
-            // otherwise, just hand message off to validation actor
-            // (by telling its actor ref)
-            _validationActor.Tell(message);
-        }
-        #endregion
-    }
+
+		/// <summary>
+		/// Reads input from console, validates it, then signals appropriate response
+		/// (continue processing, error, success, etc.).
+		/// </summary>
+		private void GetAndValidateInput()
+		{
+			var message = Console.ReadLine();
+			if (!string.IsNullOrEmpty(message) &&
+			String.Equals(message, ExitCommand, StringComparison.OrdinalIgnoreCase))
+			{
+				// if user typed ExitCommand, shut down the entire actor
+				// system (allows the process to exit)
+				Context.System.Terminate();
+				return;
+			}
+
+			// otherwise, just hand message off to validation actor
+			// (by telling its actor ref)
+			_validationActor.Tell(message);
+		}
+		#endregion
+	}
 }
 
 ```

@@ -1,5 +1,4 @@
 ﻿using System;
-﻿using Akka.Actor;
 
 namespace WinTail
 {

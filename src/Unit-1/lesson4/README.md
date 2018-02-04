@@ -272,8 +272,7 @@ namespace WinTail
             if (string.IsNullOrEmpty(msg))
             {
                 // signal that the user needs to supply an input
-                _consoleWriterActor.Tell(new Messages.NullInputError("Input was blank.
-                Please try again.\n"));
+                _consoleWriterActor.Tell(new Messages.NullInputError("Input was blank. Please try again.\n"));
 
                 // tell sender to continue doing its thing (whatever that may be,
                 // this actor doesn't care)
@@ -653,9 +652,9 @@ protected override void OnReceive(object message)
     if (message is StartTail)
     {
         var msg = message as StartTail;
-		// here we are creating our first parent/child relationship!
-		// the TailActor instance created here is a child
-		// of this instance of TailCoordinatorActor
+        // here we are creating our first parent/child relationship!
+        // the TailActor instance created here is a child
+        // of this instance of TailCoordinatorActor
         Context.ActorOf(Props.Create(
           () => new TailActor(msg.ReporterActor, msg.FilePath)));
     }

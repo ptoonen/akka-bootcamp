@@ -72,7 +72,7 @@ namespace WinTail
                 }
                 else
                 {
-                    Self.Tell(new Messages.ValidationError("Invalid: input had odd number of characters."));
+                    Self.Tell(new Messages.ValidationError("Invalid: input had an odd number of characters."));
                 }
             }
         }

@@ -36,7 +36,7 @@ Where does `ActorSelection` come into play on this? Well, if you want to have a 
 You also can build extremely dynamic actors where not even the `ActorPath` needed to do an `ActorSelection` is hardcoded, but can instead be represented by a message that is passed into your actor.
 
 #### Flexible communication patterns == adaptable system
-Let's run w/ this idea of adaptability, because it's important for your happiness as a developer, the resilience of your system, and the speed at which your organization can move.
+Let's run with this idea of adaptability, because it's important for your happiness as a developer, the resilience of your system, and the speed at which your organization can move.
 
 Since you don't have to couple everything together to make it work, this will speed up your development cycles. You can introduce new actors and entirely new sections into the actor hierarchy without having to go back and change everything you've already written. Your system has a much more flexible communication structure that can expand and accommodate new actors (and requirements) easily.
 
@@ -179,7 +179,7 @@ public FileValidatorActor(IActorRef consoleWriterActor)
 
 *This one is a little counter-intuitive*. Here's the deal.
 
-In this case, we aren't using the handle for `consoleWriterActor` to talk directly to it. Instead we are putting that `IActorRef` inside a message that is getting sent somewhere else in the system for processing. When that message is received, the receiving actor will know everything it needs to in order to do its job.
+In this case, we aren't just using the handle for `consoleWriterActor` to talk directly to it. Instead we are putting that `IActorRef` inside a message that is getting sent somewhere else in the system for processing. When that message is received, the receiving actor will know everything it needs to in order to do its job.
 
 This is actually a good design pattern in the actor model, because it makes the message being passed entirely self-contained and keeps the system as a whole flexible, even if this one actor (`FileValidatorActor`) needs an `IActorRef` passed in and is a little coupled.
 
